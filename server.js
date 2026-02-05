@@ -10,7 +10,7 @@ const app = express();
    ✅ CORS (SIMPLE + CLEAN)
 ========================= */
 app.use(cors({
-  origin: "https://webtechillusion.com",
+  origin: "web-tech-illusion-frontend-bpaw-f9n8w6z5f.vercel.app",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

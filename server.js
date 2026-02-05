@@ -10,7 +10,7 @@ const app = express();
    ✅ CORS (SIMPLE + CLEAN)
 ========================= */
 app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:5174'],
+  origin: "https://webtechillusion.com",
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

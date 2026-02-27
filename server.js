@@ -12,7 +12,9 @@ const app = express();
 app.use(cors({
   origin: [
   "https://webtechillusion.com",
-  "https://www.webtechillusion.com"
+  "https://www.webtechillusion.com",
+  "http://localhost:5000"
+ 
 ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -50,6 +52,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/illusion_
 app.use('/api/contact', require('./routes/contact'));
 app.use('/api/newsletter', require('./routes/newsletter'));
 app.use('/api/auth', require('./routes/auth'));
+app.use('/api/blog', require('./routes/blog'));
 app.use('/admin', require('./routes/dashboard'));
 
 /* =========================

@@ -49,6 +49,60 @@ const blogSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+  // SEO Fields below
+  slug: {
+    type: String,
+    unique: true,
+    sparse: true,
+    trim: true
+  },
+  metaTitle: {
+    type: String,
+    trim: true
+  },
+  metaDescription: {
+    type: String,
+    trim: true
+  },
+  metaKeywords: {
+    type: String,
+    trim: true
+  },
+  h1Heading: {
+    type: String,
+    trim: true
+  },
+  ogImage: {
+    type: String
+  },
+  ogTitle: {
+    type: String,
+    trim: true
+  },
+  metaTitleLink: {
+    type: String,
+    trim: true
+  },
+  metaDescriptionLink: {
+    type: String,
+    trim: true
+  },
+  metaKeywordsLink: {
+    type: String,
+    trim: true
+  },
+  h1HeadingLink: {
+    type: String,
+    trim: true
+  },
+  ogImageLink: {
+    type: String,
+    trim: true
+  },
+  imageLink: {
+    type: String,
+    trim: true
   }
 }, {
   timestamps: true

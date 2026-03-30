@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
 });
 
 // API Stats endpoint
-router.get('/api/stats', async (req, res) => {
+router.get('/stats', async (req, res) => {
   try {
     const totalContacts = await Contact.countDocuments();
     const newContacts = await Contact.countDocuments({ status: 'new' });

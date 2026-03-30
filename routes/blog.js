@@ -1,29 +1,8 @@
 const express = require('express');
 const Blog = require('../models/Blog');
-const jwt = require('jsonwebtoken');
+const { verifyToken } = require('./auth');
 const router = express.Router();
 
-const verifyToken = (req, res, next) => {
-  const token = req.header('Authorization')?.replace('Bearer ', '');
-
-  if (!token) {
-    return res.status(401).json({
-      success: false,
-      message: 'Access denied. No token provided.'
-    });
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'illusion_jwt_secret');
-    req.user = decoded;
-    next();
-  } catch (error) {
-    res.status(401).json({
-      success: false,
-      message: 'Invalid token'
-    });
-  }
-};
 
 // Get all published blogs (public)
 router.get('/', async (req, res) => {
@@ -133,7 +112,11 @@ router.get('/admin/all', verifyToken, async (req, res) => {
 // Create blog (protected)
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { title, excerpt, content, category, author, image, readTime, status, isFeatured } = req.body;
+    const { 
+      title, excerpt, content, category, author, image, imageLink, readTime, status, isFeatured,
+      slug, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle,
+      metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink, ogImageLink
+    } = req.body;
 
     if (!title || !excerpt || !content || !category || !image) {
       return res.status(400).json({
@@ -151,7 +134,20 @@ router.post('/', verifyToken, async (req, res) => {
       image,
       readTime: readTime || '5 min read',
       status: status || 'draft',
-      isFeatured: isFeatured || false
+      isFeatured: isFeatured || false,
+      slug,
+      metaTitle,
+      metaDescription,
+      metaKeywords,
+      h1Heading,
+      ogImage,
+      ogTitle,
+      metaTitleLink,
+      metaDescriptionLink,
+      metaKeywordsLink,
+      h1HeadingLink,
+      ogImageLink,
+      imageLink
     });
 
     await blog.save();
@@ -173,7 +169,11 @@ router.post('/', verifyToken, async (req, res) => {
 // Update blog (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { title, excerpt, content, category, author, image, readTime, status, isFeatured } = req.body;
+    const { 
+      title, excerpt, content, category, author, image, imageLink, readTime, status, isFeatured,
+      slug, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle,
+      metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink, ogImageLink
+    } = req.body;
 
     const blog = await Blog.findById(req.params.id);
 
@@ -193,6 +193,21 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (readTime) blog.readTime = readTime;
     if (status) blog.status = status;
     if (isFeatured !== undefined) blog.isFeatured = isFeatured;
+    
+    // SEO Fields
+    if (slug !== undefined) blog.slug = slug;
+    if (metaTitle !== undefined) blog.metaTitle = metaTitle;
+    if (metaDescription !== undefined) blog.metaDescription = metaDescription;
+    if (metaKeywords !== undefined) blog.metaKeywords = metaKeywords;
+    if (h1Heading !== undefined) blog.h1Heading = h1Heading;
+    if (ogImage !== undefined) blog.ogImage = ogImage;
+    if (ogTitle !== undefined) blog.ogTitle = ogTitle;
+    if (metaTitleLink !== undefined) blog.metaTitleLink = metaTitleLink;
+    if (metaDescriptionLink !== undefined) blog.metaDescriptionLink = metaDescriptionLink;
+    if (metaKeywordsLink !== undefined) blog.metaKeywordsLink = metaKeywordsLink;
+    if (h1HeadingLink !== undefined) blog.h1HeadingLink = h1HeadingLink;
+    if (ogImageLink !== undefined) blog.ogImageLink = ogImageLink;
+    if (imageLink !== undefined) blog.imageLink = imageLink;
 
     await blog.save();
 

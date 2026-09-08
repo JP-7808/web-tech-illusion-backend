@@ -11,6 +11,10 @@ const contactSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  projectType: {
+    type: String,
+    trim: true
+  },
   email: {
     type: String,
     required: false,

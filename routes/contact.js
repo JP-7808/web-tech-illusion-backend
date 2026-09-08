@@ -39,7 +39,7 @@ const verifyToken = (req, res, next) => {
 ========================= */
 router.post('/', async (req, res) => {
   try {
-    const { name, phone, email, message } = req.body;
+    const { name, phone, email, projectType, message } = req.body;
 
     if (!name || !phone) {
       return res.status(400).json({
@@ -52,6 +52,7 @@ router.post('/', async (req, res) => {
       name,
       phone,
       email: email || '',
+      projectType: projectType || '',
       message: message || ''
     });
 

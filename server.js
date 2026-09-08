@@ -14,7 +14,6 @@ app.use(cors({
     "https://webtechillusion.com",
     "https://www.webtechillusion.com",
     "https://admin-panel-cyan-pi.vercel.app",
-    "https://monkfish-app-d576n.ondigitalocean.app",
     "http://localhost:5000",
     "http://localhost:5001",
     "http://localhost:5173",

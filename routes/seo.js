@@ -29,7 +29,7 @@ router.get('/:pageName', async (req, res) => {
 // Create or update SEO config (Protected)
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { pageName, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle, ogImageLink, metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink } = req.body;
+    const { pageName, slug, canonicalUrl, robots, schemaType, focusKeyword, imageAltText, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle, ogImageLink, metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink } = req.body;
     
     if (!pageName || !metaTitle) {
        return res.status(400).json({ success: false, message: 'PageName and MetaTitle are required' });
@@ -40,6 +40,12 @@ router.post('/', verifyToken, async (req, res) => {
     if (config) {
       // Update existing
       config.metaTitle = metaTitle;
+      if (slug !== undefined) config.slug = slug;
+      if (canonicalUrl !== undefined) config.canonicalUrl = canonicalUrl;
+      if (robots !== undefined) config.robots = robots;
+      if (schemaType !== undefined) config.schemaType = schemaType;
+      if (focusKeyword !== undefined) config.focusKeyword = focusKeyword;
+      if (imageAltText !== undefined) config.imageAltText = imageAltText;
       if (metaDescription !== undefined) config.metaDescription = metaDescription;
       if (metaKeywords !== undefined) config.metaKeywords = metaKeywords;
       if (h1Heading !== undefined) config.h1Heading = h1Heading;
@@ -55,7 +61,7 @@ router.post('/', verifyToken, async (req, res) => {
       return res.json({ success: true, message: 'SEO config updated', data: config });
     } else {
       // Create new
-      config = new Seo({ pageName, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle, ogImageLink, metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink });
+      config = new Seo({ pageName, slug, canonicalUrl, robots, schemaType, focusKeyword, imageAltText, metaTitle, metaDescription, metaKeywords, h1Heading, ogImage, ogTitle, ogImageLink, metaTitleLink, metaDescriptionLink, metaKeywordsLink, h1HeadingLink });
       await config.save();
       return res.status(201).json({ success: true, message: 'SEO config created', data: config });
     }

@@ -6,7 +6,34 @@ const seoSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
-    enum: ['home', 'about', 'services', 'projects', 'team', 'contact', 'industries', 'careers', 'case-studies', 'documentation']
+    enum: ['home', 'about', 'services', 'projects', 'team', 'contact', 'industries', 'careers', 'case-studies', 'documentation', 'blog']
+  },
+  slug: {
+    type: String,
+    trim: true,
+    lowercase: true
+  },
+  canonicalUrl: {
+    type: String,
+    trim: true
+  },
+  robots: {
+    type: String,
+    trim: true,
+    default: 'index, follow'
+  },
+  schemaType: {
+    type: String,
+    trim: true,
+    default: 'WebPage'
+  },
+  focusKeyword: {
+    type: String,
+    trim: true
+  },
+  imageAltText: {
+    type: String,
+    trim: true
   },
   metaTitle: {
     type: String,

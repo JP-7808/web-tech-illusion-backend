@@ -72,6 +72,18 @@ app.use('/api/settings', require('./routes/settings'));
 app.use('/admin', require('./routes/dashboard'));
 
 /* =========================
+   ✅ SITEMAP & ROBOTS
+========================= */
+app.get('/sitemap.xml', (req, res) => {
+  res.redirect('/api/seo/dynamic/sitemap.xml');
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.type('text/plain');
+  res.send(`User-agent: *\nAllow: /\nDisallow: /dashboard\nDisallow: /dashboard/admin\n\nSitemap: https://webtechillusion.com/sitemap.xml\n`);
+});
+
+/* =========================
    ✅ HEALTH CHECK
 ========================= */
 app.get('/', (req, res) => {

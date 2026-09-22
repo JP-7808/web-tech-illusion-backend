@@ -3,6 +3,14 @@ const Team = require('../models/Team');
 const { verifyToken } = require('./auth');
 const router = express.Router();
 
+const slugify = (value = '') => {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'team-member';
+};
+
 const defaultTeam = [
   {
     name: 'Aarav Sharma',
@@ -12,6 +20,7 @@ const defaultTeam = [
     skills: ['React', 'Node.js', 'MongoDB', 'UI Architecture'],
     experience: '5+ years experience',
     image: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=900&q=80',
+    slug: 'aarav-sharma',
     status: 'active',
     order: 1
   },
@@ -23,6 +32,7 @@ const defaultTeam = [
     skills: ['Figma', 'Design Systems', 'UX Strategy', 'Brand Design'],
     experience: '4+ years experience',
     image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=900&q=80',
+    slug: 'neha-verma',
     status: 'active',
     order: 2
   },
@@ -34,6 +44,7 @@ const defaultTeam = [
     skills: ['SEO', 'Content Strategy', 'Analytics', 'Lead Generation'],
     experience: '6+ years experience',
     image: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80',
+    slug: 'rohit-mehta',
     status: 'active',
     order: 3
   },
@@ -45,10 +56,24 @@ const defaultTeam = [
     skills: ['Roadmapping', 'Agile', 'Product QA', 'Stakeholder Management'],
     experience: '7+ years experience',
     image: 'https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?auto=format&fit=crop&w=900&q=80',
+    slug: 'sana-khan',
     status: 'active',
     order: 4
   }
 ];
+
+const ensureUniqueSlug = async (name, currentId = null) => {
+  const baseSlug = slugify(name || 'team-member');
+  let slug = baseSlug;
+  let counter = 1;
+
+  while (true) {
+    const existing = await Team.findOne({ slug, _id: { $ne: currentId } });
+    if (!existing) return slug;
+    slug = `${baseSlug}-${counter}`;
+    counter += 1;
+  }
+};
 
 // Get all active team members (public)
 router.get('/', async (req, res) => {
@@ -73,6 +98,18 @@ router.get('/admin/all', verifyToken, async (req, res) => {
       return res.json({ success: true, data: seeded, count: seeded.length });
     }
     res.json({ success: true, data: team, count: team.length });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error' });
+  }
+});
+
+router.get('/slug/:slug', async (req, res) => {
+  try {
+    const member = await Team.findOne({ slug: req.params.slug, status: 'active' });
+    if (!member) {
+      return res.status(404).json({ success: false, message: 'Team member not found' });
+    }
+    res.json({ success: true, data: member });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Server Error' });
   }
@@ -104,7 +141,7 @@ router.get('/:id', async (req, res) => {
 // Create team member (protected)
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { name, role, specialization, bio, skills, experience, image, status, order } = req.body;
+    const { name, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
 
     if (!name || !role || !image) {
       return res.status(400).json({ success: false, message: 'Name, role and image are required' });
@@ -118,6 +155,7 @@ router.post('/', verifyToken, async (req, res) => {
       skills: skills || [],
       experience,
       image,
+      slug: slug || await ensureUniqueSlug(name),
       status: status || 'active',
       order: order || 0
     });
@@ -138,7 +176,7 @@ router.post('/', verifyToken, async (req, res) => {
 // Update team member (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { name, role, specialization, bio, skills, experience, image, status, order } = req.body;
+    const { name, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
 
     const member = await Team.findById(req.params.id);
 
@@ -155,6 +193,8 @@ router.put('/:id', verifyToken, async (req, res) => {
     if (image) member.image = image;
     if (status) member.status = status;
     if (order !== undefined) member.order = order;
+    if (slug && slug.trim()) member.slug = slug.trim();
+    else if (name) member.slug = await ensureUniqueSlug(name, member._id);
 
     await member.save();
 

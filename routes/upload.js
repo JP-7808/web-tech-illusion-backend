@@ -3,6 +3,20 @@ const router = express.Router();
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
+
+const hasCloudinaryConfig =
+  !!process.env.CLOUDINARY_URL ||
+  (!!process.env.CLOUDINARY_CLOUD_NAME && !!process.env.CLOUDINARY_API_KEY && !!process.env.CLOUDINARY_API_SECRET);
+
+if (hasCloudinaryConfig) {
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || undefined,
+    api_key: process.env.CLOUDINARY_API_KEY || undefined,
+    api_secret: process.env.CLOUDINARY_API_SECRET || undefined,
+    secure: true
+  });
+}
 
 // Ensure upload directory exists
 const uploadDir = path.join(__dirname, '../public/uploads');
@@ -21,7 +35,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit
   fileFilter: (req, file, cb) => {
@@ -33,25 +47,54 @@ const upload = multer({
   }
 });
 
+const uploadToCloudinary = async (file) => {
+  if (!hasCloudinaryConfig) return null;
+
+  const uploadResult = await cloudinary.uploader.upload(file.path, {
+    folder: 'web-tech-illusion',
+    resource_type: 'image',
+    transformation: [{ quality: 'auto', fetch_format: 'auto' }]
+  });
+
+  return uploadResult.secure_url;
+};
+
 // Single image upload
-router.post('/', upload.single('image'), (req, res) => {
+router.post('/', upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'Please upload a valid image' });
     }
-    
-    // Create absolute URL based on host domain / localhost
+
+    if (hasCloudinaryConfig) {
+      const cloudinaryUrl = await uploadToCloudinary(req.file);
+
+      if (cloudinaryUrl) {
+        if (fs.existsSync(req.file.path)) {
+          fs.unlinkSync(req.file.path);
+        }
+
+        return res.status(200).json({
+          success: true,
+          message: 'Image uploaded successfully to Cloudinary!',
+          url: cloudinaryUrl
+        });
+      }
+    }
+
+    // Fallback for local environments without Cloudinary credentials
     const protocol = req.protocol;
     const host = req.get('host');
     const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
-    
-    res.status(200).json({ 
-      success: true, 
+
+    res.status(200).json({
+      success: true,
       message: 'Image uploaded successfully!',
-      url: imageUrl 
+      url: imageUrl
     });
   } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+    console.error('Upload error:', error);
+    res.status(500).json({ success: false, message: error.message || 'Image upload failed' });
   }
 });
 

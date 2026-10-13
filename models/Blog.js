@@ -18,13 +18,37 @@ const blogSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['web-development', 'ui-ux-design', 'digital-marketing', 'mobile-apps', 'technology']
+    default: 'General',
+    trim: true
   },
   author: {
     type: String,
     required: true,
-    default: 'WebTech Illusion Team'
+    default: 'WebTech Illusion Team',
+    trim: true
   },
+  authorEmail: {
+    type: String,
+    trim: true
+  },
+  teamMember: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Team'
+  },
+  tags: [{
+    type: String,
+    trim: true
+  }],
+  faqs: [{
+    question: {
+      type: String,
+      trim: true
+    },
+    answer: {
+      type: String,
+      trim: true
+    }
+  }],
   image: {
     type: String,
     required: true
@@ -106,6 +130,21 @@ const blogSchema = new mongoose.Schema({
   }
 }, {
   timestamps: true
+});
+
+const slugify = (value = '') => {
+  return String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'blog-post';
+};
+
+blogSchema.pre('validate', function(next) {
+  if (!this.slug && this.title) {
+    this.slug = slugify(this.title);
+  }
+  next();
 });
 
 module.exports = mongoose.model('Blog', blogSchema);

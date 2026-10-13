@@ -13,7 +13,9 @@ const slugify = (value = '') => {
 
 const defaultTeam = [
   {
+    teamId: 'WTI-101',
     name: 'Aarav Sharma',
+    email: 'aarav@webtechillusion.com',
     role: 'Full-Stack Developer',
     specialization: 'React, Node.js & scalable product engineering',
     bio: 'Builds clean architecture and product experiences that feel premium and perform fast.',
@@ -25,7 +27,9 @@ const defaultTeam = [
     order: 1
   },
   {
+    teamId: 'WTI-102',
     name: 'Neha Verma',
+    email: 'neha@webtechillusion.com',
     role: 'UI/UX Designer',
     specialization: 'Conversion-focused design systems and digital experiences',
     bio: 'Creates premium interfaces that harmonize trust, clarity, and simplicity for modern brands.',
@@ -37,7 +41,9 @@ const defaultTeam = [
     order: 2
   },
   {
+    teamId: 'WTI-103',
     name: 'Rohit Mehta',
+    email: 'rohit@webtechillusion.com',
     role: 'Digital Growth Strategist',
     specialization: 'SEO, funnel planning and performance campaigns',
     bio: 'Helps brands grow through smarter acquisition, content strategy, and analytics-driven improvements.',
@@ -49,7 +55,9 @@ const defaultTeam = [
     order: 3
   },
   {
+    teamId: 'WTI-104',
     name: 'Sana Khan',
+    email: 'sana@webtechillusion.com',
     role: 'Product Manager',
     specialization: 'Roadmaps, sprint planning and delivery excellence',
     bio: 'Connects business goals with technical delivery to keep product growth focused and measurable.',
@@ -141,14 +149,16 @@ router.get('/:id', async (req, res) => {
 // Create team member (protected)
 router.post('/', verifyToken, async (req, res) => {
   try {
-    const { name, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
+    const { teamId, name, email, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
 
     if (!name || !role || !image) {
       return res.status(400).json({ success: false, message: 'Name, role and image are required' });
     }
 
     const member = new Team({
+      teamId: teamId ? String(teamId).trim() : undefined,
       name,
+      email: email ? String(email).trim().toLowerCase() : undefined,
       role,
       specialization,
       bio,
@@ -176,7 +186,7 @@ router.post('/', verifyToken, async (req, res) => {
 // Update team member (protected)
 router.put('/:id', verifyToken, async (req, res) => {
   try {
-    const { name, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
+    const { teamId, name, email, role, specialization, bio, skills, experience, image, status, order, slug } = req.body;
 
     const member = await Team.findById(req.params.id);
 
@@ -184,6 +194,8 @@ router.put('/:id', verifyToken, async (req, res) => {
       return res.status(404).json({ success: false, message: 'Team member not found' });
     }
 
+    if (teamId !== undefined) member.teamId = teamId ? String(teamId).trim() : '';
+    if (email !== undefined) member.email = email ? String(email).trim().toLowerCase() : '';
     if (name) member.name = name;
     if (role) member.role = role;
     if (specialization !== undefined) member.specialization = specialization;

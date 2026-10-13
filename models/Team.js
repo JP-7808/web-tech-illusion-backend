@@ -9,10 +9,20 @@ const slugify = (value = '') => {
 };
 
 const teamSchema = new mongoose.Schema({
+  teamId: {
+    type: String,
+    trim: true,
+    sparse: true
+  },
   name: {
     type: String,
     required: true,
     trim: true
+  },
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true
   },
   role: {
     type: String,

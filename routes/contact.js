@@ -150,4 +150,31 @@ router.patch('/:id/status', verifyToken, async (req, res) => {
   }
 });
 
+/* =========================
+   ✅ DELETE CONTACT (ADMIN)
+========================= */
+router.delete('/:id', verifyToken, async (req, res) => {
+  try {
+    const contact = await Contact.findByIdAndDelete(req.params.id);
+
+    if (!contact) {
+      return res.status(404).json({
+        success: false,
+        message: 'Contact submission not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Contact submission deleted successfully'
+    });
+  } catch (error) {
+    console.error('❌ Delete contact error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting contact submission'
+    });
+  }
+});
+
 module.exports = router;

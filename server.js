@@ -6,6 +6,9 @@ require('dotenv').config();
 
 const app = express();
 
+// Trust reverse proxy (Render, Cloudflare, etc.) so client IPs are accurate
+app.set('trust proxy', 1);
+
 /* =========================
    ✅ CORS (SIMPLE + CLEAN)
 ========================= */
@@ -40,7 +43,14 @@ app.use(express.json());
 ========================= */
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100
+  max: 2000,
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'GET' || req.method === 'OPTIONS',
+  message: {
+    success: false,
+    message: 'Too many requests, please try again after 15 minutes.'
+  }
 }));
 
 /* =========================

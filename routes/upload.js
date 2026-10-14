@@ -5,15 +5,19 @@ const path = require('path');
 const fs = require('fs');
 const cloudinary = require('cloudinary').v2;
 
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || 'dgoe6emli';
+const apiKey = process.env.CLOUDINARY_API_KEY || '691483461292698';
+const apiSecret = process.env.CLOUDINARY_API_SECRET || 'kjx0fkzxGQZChwTYTINErnhBsgg';
+
 const hasCloudinaryConfig =
   !!process.env.CLOUDINARY_URL ||
-  (!!process.env.CLOUDINARY_CLOUD_NAME && !!process.env.CLOUDINARY_API_KEY && !!process.env.CLOUDINARY_API_SECRET);
+  (!!cloudName && !!apiKey && !!apiSecret);
 
 if (hasCloudinaryConfig) {
   cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || undefined,
-    api_key: process.env.CLOUDINARY_API_KEY || undefined,
-    api_secret: process.env.CLOUDINARY_API_SECRET || undefined,
+    cloud_name: cloudName,
+    api_key: apiKey,
+    api_secret: apiSecret,
     secure: true
   });
 }
@@ -83,7 +87,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     }
 
     // Fallback for local environments without Cloudinary credentials
-    const protocol = req.protocol;
+    const protocol = req.headers['x-forwarded-proto'] || (req.secure ? 'https' : req.protocol) || 'https';
     const host = req.get('host');
     const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
 

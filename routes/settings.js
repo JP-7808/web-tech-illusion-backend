@@ -123,7 +123,7 @@ router.post('/init', verifyToken, requireSuperAdmin, async (req, res) => {
       { key: 'contact_email', value: 'webtechillusion@gmail.com', type: 'email', group: 'contact', label: 'Email Address', order: 1 },
       { key: 'contact_phone', value: '+91 73791 18083', type: 'phone', group: 'contact', label: 'Phone Number', order: 2 },
       { key: 'contact_whatsapp', value: '917379118083', type: 'phone', group: 'contact', label: 'WhatsApp Number', order: 3 },
-      { key: 'contact_address', value: 'Sector 16/1033, Indiranagar, Lucknow', type: 'text', group: 'contact', label: 'Address', order: 4 },
+      { key: 'contact_address', value: '16/1033 Road, Sector 16, Indira Nagar, Lucknow, Uttar Pradesh 226016', type: 'text', group: 'contact', label: 'Address', order: 4 },
       
       // Social Links
       { key: 'social_facebook', value: '', type: 'url', group: 'social', label: 'Facebook URL', order: 1 },
